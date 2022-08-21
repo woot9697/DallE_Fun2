@@ -51,12 +51,12 @@ const Index = () => {
               width="96"
             />
             <Typography.Title level={3}>
-              Welcome to Supabase Auth
+              Welcome to DallE Fun Auth
             </Typography.Title>
           </div>
           <Auth
             supabaseClient={supabase}
-            providers={['google', 'github']}
+            // providers={['google', 'github']}
             view={authView}
             socialLayout="horizontal"
             socialButtonSize="xlarge"

@@ -1,45 +1,60 @@
-import Link from 'next/link'
-import useSWR from 'swr'
-import { Auth, Card, Typography, Space, Button, Icon } from '@supabase/ui'
-import { supabase } from '../lib/initSupabase'
-import { useEffect, useState } from 'react'
+import Link from "next/link";
+import useSWR from "swr";
+import {
+  Auth,
+  Card,
+  Typography,
+  Space,
+  Button as SupabaseButton,
+  Icon,
+} from "@supabase/ui";
+import { supabase } from "../lib/initSupabase";
+import { useEffect, useState, useCallback } from "react";
+import { TextInput, Box, Group, Divider, Button } from "@mantine/core";
+import {v4 as uuidv4} from 'uuid';
 
 const fetcher = (url, token) =>
   fetch(url, {
-    method: 'GET',
-    headers: new Headers({ 'Content-Type': 'application/json', token }),
-    credentials: 'same-origin',
-  }).then((res) => res.json())
+    method: "GET",
+    headers: new Headers({ "Content-Type": "application/json", token }),
+    credentials: "same-origin",
+  }).then((res) => res.json());
 
 const Index = () => {
-  const { user, session } = Auth.useUser()
+  const { user, session } = Auth.useUser();
   const { data, error } = useSWR(
-    session ? ['/api/getUser', session.access_token] : null,
+    session ? ["/api/getUser", session.access_token] : null,
     fetcher
-  )
-  const [authView, setAuthView] = useState('sign_in')
-
+  );
+  const [authView, setAuthView] = useState("sign_in");
+  console.log(user);
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'PASSWORD_RECOVERY') setAuthView('update_password')
-        if (event === 'USER_UPDATED')
-          setTimeout(() => setAuthView('sign_in'), 1000)
+        if (event === "PASSWORD_RECOVERY") setAuthView("update_password");
+        if (event === "USER_UPDATED")
+          setTimeout(() => setAuthView("sign_in"), 1000);
         // Send session to /api/auth route to set the auth cookie.
         // NOTE: this is only needed if you're doing SSR (getServerSideProps)!
-        fetch('/api/auth', {
-          method: 'POST',
-          headers: new Headers({ 'Content-Type': 'application/json' }),
-          credentials: 'same-origin',
+        fetch("/api/auth", {
+          method: "POST",
+          headers: new Headers({ "Content-Type": "application/json" }),
+          credentials: "same-origin",
           body: JSON.stringify({ event, session }),
-        }).then((res) => res.json())
+        }).then((res) => res.json());
       }
-    )
+    );
 
     return () => {
-      authListener.unsubscribe()
-    }
-  }, [])
+      authListener.unsubscribe();
+    };
+  }, []);
+
+  const createLobby = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("Lobbies")
+      .insert([{ id: uuidv4()}]);
+  });
 
   const View = () => {
     if (!user)
@@ -62,60 +77,56 @@ const Index = () => {
             socialButtonSize="xlarge"
           />
         </Space>
-      )
+      );
 
     return (
       <Space direction="vertical" size={6}>
-        {authView === 'update_password' && (
+        {authView === "update_password" && (
           <Auth.UpdatePassword supabaseClient={supabase} />
         )}
         {user && (
-          <>
+          <Group sx={{ flexDirection: "column" }}>
             <Typography.Text>You're signed in</Typography.Text>
             <Typography.Text strong>Email: {user.email}</Typography.Text>
 
-            <Button
+            <SupabaseButton
               icon={<Icon type="LogOut" />}
               type="outline"
               onClick={() => supabase.auth.signOut()}
             >
               Log out
-            </Button>
-            {error && (
-              <Typography.Text danger>Failed to fetch user!</Typography.Text>
-            )}
-            {data && !error ? (
-              <>
-                <Typography.Text type="success">
-                  User data retrieved server-side (in API route):
-                </Typography.Text>
-
-                <Typography.Text>
-                  <pre>{JSON.stringify(data, null, 2)}</pre>
-                </Typography.Text>
-              </>
-            ) : (
-              <div>Loading...</div>
-            )}
-
-            <Typography.Text>
-              <Link href="/profile">
-                <a>SSR example with getServerSideProps</a>
-              </Link>
-            </Typography.Text>
-          </>
+            </SupabaseButton>
+            <Group
+              sx={{
+                flexDirection: "column",
+                width: "100%",
+                backgroundColor: "white",
+                padding: "1rem",
+              }}
+            >
+              <TextInput placeholder="Lobby Code" label="Join Existing Lobby" />
+              <Divider />
+              <Button
+                variant="gradient"
+                gradient={{ from: "indigo", to: "cyan" }}
+                onClick={()=>createLobby()}
+              >
+                Create Lobby
+              </Button>
+            </Group>
+          </Group>
         )}
       </Space>
-    )
-  }
+    );
+  };
 
   return (
-    <div style={{ maxWidth: '420px', margin: '96px auto' }}>
+    <div style={{ maxWidth: "420px", margin: "96px auto" }}>
       <Card>
         <View />
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default Index
+export default Index;

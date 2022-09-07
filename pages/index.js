@@ -36,8 +36,8 @@ const Index = () => {
       }
     );
 
-    return () => {
-      authListener.unsubscribe();
+     return () => {
+     authListener.unsubscribe();
     };
   }, []);
 

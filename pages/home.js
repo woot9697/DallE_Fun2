@@ -2,14 +2,15 @@ import { TextInput, Box, Group, Divider, Button } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { supabase } from "../lib/initSupabase";
+import { Auth } from "@supabase/ui";
 
 const homePage = () => {
     const router = useRouter()
-  useEffect(() => {
+    useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === "SIGNED_OUT") router.push("/");
-      }
+        if (event === "SIGNED_OUT" ) router.push("/");
+      } 
     );
     return (
       () => {

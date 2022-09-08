@@ -6,11 +6,24 @@
     "start": "next start"
   },
   "dependencies": {
+    "@mantine/core": "^5.2.7",
+    "@mantine/hooks": "^5.2.7",
     "@supabase/supabase-js": "^1.2.1",
     "@supabase/ui": "^0.36.2",
     "next": "latest",
+    "next-auth": "^4.10.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "swr": "1.1.2"
-  }
+  },
+  "name": "dalle_fun2",
+  "description": "This example shows how to use Supabase Auth on the client and server in both [API Routes](https://nextjs.org/docs/api-routes/introduction) and when using [server-side rendering (SSR)](https://nextjs.org/docs/basic-features/pages#server-side-rendering).",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {}
 }
